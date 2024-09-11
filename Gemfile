@@ -49,7 +49,6 @@ gem 'bootsnap', require: false
 # Code formatter for Ruby. It enforces the Ruby style guide, detects potential code issues.
 # Useful for maintaining consistent code quality and style across the project.
 gem 'rubocop', '~> 1.66', require: false
-gem 'rubocop-discourse', '~> 3.8', '>= 3.8.1', require: false
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

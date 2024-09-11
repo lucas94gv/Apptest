@@ -3,7 +3,3 @@ AllCops:
   Exclude:
     - 'bin/bundle'
     - 'config/environments/development.rb'
-  #inherit_gem:
-  #  rubocop-discourse: default.yml
-  require:
-  - rubocop-discourse
