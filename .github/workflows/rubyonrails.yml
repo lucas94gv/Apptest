@@ -7,10 +7,10 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  Ruby:
     runs-on: ubuntu-latest
 
-    services: 
+    services:
       postgres:
         image: postgres:12
         env:
@@ -24,10 +24,6 @@ jobs:
         with:
           ruby-version: 3.3.0
 
-      # - uses: Borales/actions-yarn@v2.3.0
-      #   with:
-      #     cmd: install
-
       - name: Install Dependencies
         run: |
           sudo apt install -yqq libpq-dev
@@ -36,7 +32,23 @@ jobs:
       - name: Install Gems
         run: |
           bundle install
+  #Rubocop
+  Database:
+    runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: [ '5432:5432' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
+        with:
+          ruby-version: 3.3.0
       - name: Setup database
         env:
           PG_DATABASE: postgres
@@ -49,7 +61,22 @@ jobs:
         run: |
           bundle exec rails db:prepare
           bundle exec rake test
+  Rspec:
+    runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: [ '5432:5432' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
+        with:
+          ruby-version: 3.3.0
       - name: Build and test with rspec
         env:
           PG_DATABASE: postgres
@@ -59,9 +86,54 @@ jobs:
           RAILS_ENV: test
         run: |
           bundle exec rspec spec
+    
+    
 
-      # - name: Create Coverage Artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: code-coverage
-      #     path: coverage/
+#  test:
+#    runs-on: ubuntu-latest
+#
+#    services:
+#      postgres:
+#        image: postgres:12
+#        env:
+#          POSTGRES_PASSWORD: postgres
+#        ports: ['5432:5432']
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Setup Ruby
+#        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
+#        with:
+#          ruby-version: 3.3.0
+#
+#      - name: Install Dependencies
+#        run: |
+#          sudo apt install -yqq libpq-dev
+#          gem install bundler
+#
+#      - name: Install Gems
+#        run: |
+#          bundle install
+#
+#      - name: Setup database
+#        env:
+#          PG_DATABASE: postgres
+#          PG_HOST: 127.0.0.1
+#          PG_USER: postgres
+#          PG_PASSWORD: postgres
+#          RAILS_ENV: test
+#          WITH_COVERAGE: true
+#          DISABLE_SPRING: 1
+#        run: |
+#          bundle exec rails db:prepare
+#          bundle exec rake test
+#
+#      - name: Build and test with rspec
+#        env:
+#          PG_DATABASE: postgres
+#          PG_HOST: 127.0.0.1
+#          PG_USER: postgres
+#          PG_PASSWORD: postgres
+#          RAILS_ENV: test
+#        run: |
+#          bundle exec rspec spec
