@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  Ruby:
+  Setup:
     runs-on: ubuntu-latest
 
     services:
@@ -15,7 +15,7 @@ jobs:
         image: postgres:12
         env:
           POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
+        ports: [ '5432:5432' ]
 
     steps:
       - uses: actions/checkout@v4
@@ -32,32 +32,17 @@ jobs:
       - name: Install Gems
         run: |
           bundle install
+
+
+  #Ruby:
+    #needs: Setup
+
   #Rubocop
   Database:
+    needs: Setup
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:12
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports: [ '5432:5432' ]
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
-        with:
-          ruby-version: 3.3.0
-
-      - name: Install Dependencies
-        run: |
-          sudo apt install -yqq libpq-dev
-          gem install bundler
-
-      - name: Install Gems
-        run: bundle install
-
       - name: Setup database
         env:
           PG_DATABASE: postgres
@@ -71,6 +56,7 @@ jobs:
           bundle exec rails db:prepare
           bundle exec rake test
   Rspec:
+    needs: Setup
     runs-on: ubuntu-latest
 
     services:
@@ -81,19 +67,19 @@ jobs:
         ports: [ '5432:5432' ]
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
-        with:
-          ruby-version: 3.3.0
-
-      - name: Install Dependencies
-        run: |
-          sudo apt install -yqq libpq-dev
-          gem install bundler
-
-      - name: Install Gems
-        run: bundle install
+#      - uses: actions/checkout@v4
+#      - name: Setup Ruby
+#        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
+#        with:
+#          ruby-version: 3.3.0
+#
+#      - name: Install Dependencies
+#        run: |
+#          sudo apt install -yqq libpq-dev
+#          gem install bundler
+#
+#      - name: Install Gems
+#        run: bundle install
 
       - name: Build and test with rspec
         env:
